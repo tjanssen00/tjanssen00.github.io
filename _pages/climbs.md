@@ -19,7 +19,7 @@ tabs: true
 ---
 <div class="header-bar">
     <h1>Climbs</h1>
-    <h2>A collection of all activities I do in the mountains</h2>
+    <h2>A collection of all activities I do in the mountain</h2>
 </div>
 
 <div id="swiss-map" style="width:100%; height:600px; cursor:pointer;"></div>
