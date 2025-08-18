@@ -1,4 +1,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://tjanssen00.github.io//sitemap.xml
+Sitemap: https://tjanssen00.github.io/sitemap.xml
