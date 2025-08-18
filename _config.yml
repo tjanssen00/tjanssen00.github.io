@@ -212,7 +212,7 @@ plugins:
   - jekyll-sitemap
   - jekyll-tabs
   - jekyll-terser
-  - jekyll-toc
+  # - jekyll-toc
   - jekyll-twitter-plugin
   - jemoji
 
