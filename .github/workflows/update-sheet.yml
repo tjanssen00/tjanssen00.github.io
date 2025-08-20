@@ -1,0 +1,43 @@
+name: Update Google Sheet → JSON
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"   # every 5 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: |
+          npm init -y
+          npm install googleapis
+
+      - name: Fetch sheet and write JSON
+        env:
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          SHEET_RANGE: ${{ secrets.SHEET_RANGE }}
+          GOOGLE_SA_JSON_BASE64: ${{ secrets.GOOGLE_SA_JSON_BASE64 }}
+          OUTPUT_PATH: assets/json/table_data.json
+        run: node .github/scripts/fetch_sheet_private.js
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add assets/json/table_data.json
+          git commit -m "chore: update table_data.json from Google Sheet" || echo "No changes to commit"
+          git push
