@@ -32,7 +32,7 @@ jobs:
           SHEET_RANGE: ${{ secrets.SHEET_RANGE }}
           GOOGLE_SA_JSON_BASE64: ${{ secrets.GOOGLE_SA_JSON_BASE64 }}
           OUTPUT_PATH: assets/json/table_data.json
-        run: node .github/scripts/fetch_sheet_private.js
+        run: node _scripts/fetch_sheet_private.js
 
       - name: Commit & push if changed
         run: |
