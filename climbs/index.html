@@ -7,6 +7,28 @@ console.log("Folder:", window.location.href.replace(window.location.pathname, ""
 </script> <script>
 let map; // make map global so other functions can access it
 
+let tableData = [];
+
+fetch('../assets/json/table_data.json')
+  .then(res => res.json())
+  .then(json => {
+    tableData = json.slice(1).filter(row => row[0]); // skip empty dates
+    console.log("Table data loaded:", tableData);
+  })
+  .catch(err => console.error("Failed to load table_data.json:", err));
+
+const typeColors = {
+  "Hochtour": "purple",
+  "Hike": "green",
+  "Walk": "green",
+  "Run": "green",
+  "BackcountrySki": "blue",
+  "AlpineSki": "blue",
+  "Alpin Klettern": "red",
+  "Sport kletten": "red",
+  "Ride": "orange",
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   const mapDiv = document.getElementById('swiss-map');
   
@@ -57,9 +79,11 @@ function plotActivities(activities) {
 
         const latlngs = polyline.decode(activity.map.summary_polyline).map(([lat, lng]) => [lat, lng]);
 
+        const color = getActivityColor(activity);
+
         L.polyline(latlngs, {
-            color: 'blue',
-            weight: 3,
+            color: color,
+            weight: 5,
             opacity: 0.6
         }).addTo(map);
 
@@ -70,7 +94,80 @@ function plotActivities(activities) {
         map.fitBounds(allLatLngs);
     }
 }
-</script> <div class="tabs-bar" style="text-align:center;"> <h2>Activity type</h2> </div> <ul id="log" class="tab" data-tab="ddef9885-8775-4de9-97f9-30ed8cab13c3" data-name="log"> <li class="active" id="log-all"> <a href="#">all </a> </li> <li id="log-hochtour"> <a href="#">hochtour </a> </li> <li id="log-alpine-climb"> <a href="#">alpine climb </a> </li> <li id="log-skitour"> <a href="#">skitour </a> </li> <li id="log-trailrun"> <a href="#">trailrun </a> </li> <li id="log-hike"> <a href="#">hike </a> </li> </ul> <ul class="tab-content" id="ddef9885-8775-4de9-97f9-30ed8cab13c3" data-name="log"> <li class="active"> <p>test</p> <table data-click-to-select="true" data-height="460" data-pagination="true" data-search="true" data-toggle="table" data-url="/assets/json/table_data.json"> <thead> <tr> <th data-checkbox="true"></th> <th data-field="id" data-halign="left" data-align="center" data-sortable="true">ID</th> <th data-field="name" data-halign="center" data-align="right" data-sortable="true">Item Name</th> <th data-field="price" data-halign="right" data-align="left" data-sortable="true">Item Price</th> </tr> </thead> </table> </li> <li> <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">hello</span><span class="dl">"</span><span class="p">);</span>
+
+function formatActivityDate(isoString) {
+  const d = new Date(isoString);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}/${mm}/${dd}`;
+}
+
+function getActivityColor(activity) {
+  if (!activity.start_date || !activity.name) return "blue";
+
+  const activityDate = formatActivityDate(activity.start_date);
+
+  const match = tableData.find(row =>
+    row[0] === activityDate// && row[1] === activity.name
+  );
+
+  if (match) {
+    const type = match[2]; // type of activity
+    return typeColors[type] || "blue";
+  }
+
+  return typeColors[activity.type] || "blue";
+}
+</script> <div class="tabs-bar" style="text-align:center;"> <h2>Activity type</h2> </div> <ul id="log" class="tab" data-tab="48377678-6d48-4f2a-acc1-68848d0cf90e" data-name="log"> <li class="active" id="log-all"> <a href="#">all </a> </li> <li id="log-hochtour"> <a href="#">hochtour </a> </li> <li id="log-alpine-climb"> <a href="#">alpine climb </a> </li> <li id="log-skitour"> <a href="#">skitour </a> </li> <li id="log-trailrun"> <a href="#">trailrun </a> </li> <li id="log-hike"> <a href="#">hike </a> </li> </ul> <ul class="tab-content" id="48377678-6d48-4f2a-acc1-68848d0cf90e" data-name="log"> <li class="active"> <p>test</p> <table id="tourTable"> <thead> <tr> <th onclick="sortTable(0)">Date ⬍</th> <th onclick="sortTable(1)">Tour ⬍</th> <th onclick="sortTable(2)">Type ⬍</th> <th onclick="sortTable(3)">Difficulty ⬍</th> </tr> </thead> <tbody> </tbody> </table> <script>
+// Fetch the JSON file
+fetch('../assets/json/table_data.json')
+  .then(response => response.json())
+  .then(data => {
+    const tbody = document.querySelector("#tourTable tbody");
+    
+    // Skip the header row
+    data.slice(1).forEach(row => {
+      if (!row[0]) return;  // ignore entries with no date
+
+      // First 3 columns
+      const tr = document.createElement("tr");
+      [0,1,2].forEach(i => {
+        const td = document.createElement("td");
+        td.textContent = row[i] || "";
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+
+      // 4th column: combine columns 6, 7, 8 (indices 5,6,7)
+      const tdGrades = document.createElement("td");
+      tdGrades.textContent = [row[4], row[5], row[6], row[7]].filter(Boolean).join(", ");
+      tr.appendChild(tdGrades);
+
+      tbody.appendChild(tr);
+    });
+
+    // Sorting function
+    window.sortTable = function(colIndex) {
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      const sorted = rows.sort((a,b) => {
+        const aText = a.cells[colIndex].textContent;
+        const bText = b.cells[colIndex].textContent;
+        return aText.localeCompare(bText, undefined, {numeric: true});
+      });
+      if (tbody.dataset.sortedCol == colIndex && tbody.dataset.sortDir == "asc") {
+        sorted.reverse();
+        tbody.dataset.sortDir = "desc";
+      } else {
+        tbody.dataset.sortDir = "asc";
+      }
+      tbody.dataset.sortedCol = colIndex;
+      tbody.innerHTML = "";
+      sorted.forEach(row => tbody.appendChild(row));
+    }
+  })
+  .catch(err => console.error("Failed to load JSON:", err));
+</script> </li> <li> <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">hello</span><span class="dl">"</span><span class="p">);</span>
 </code></pre></div></div> </li> <li> <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">pputs</span> <span class="dl">'</span><span class="s1">hello</span><span class="dl">'</span>
 </code></pre></div></div> </li> <li> <p>test </p> </li> <li> <p>test </p> </li> <li> <p>test </p> </li> </ul> </div> <footer class="fixed-bottom" role="contentinfo"> <div class="container mt-0"> © Copyright 2025 Tom M.E. Janssen. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. Last updated: August 20, 2025. </div> </footer> <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> <script src="/assets/js/bootstrap.bundle.min.js"></script> <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/js/mdb.min.js" integrity="sha256-NdbiivsvWt7VYCt6hYNT3h/th9vSTL4EDWeGs5SN3DA=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@5.0.0/imagesloaded.pkgd.min.js" integrity="sha256-htrLFfZJ6v5udOG+3kNLINIKh2gvoKqwEhHYfTTMICc=" crossorigin="anonymous"></script> <script defer src="/assets/js/masonry.js?a0db7e5d5c70cc3252b3138b0c91dcaf" type="text/javascript"></script> <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js" integrity="sha256-MgH13bFTTNqsnuEoqNPBLDaqxjGH+lCpqrukmXc8Ppg=" crossorigin="anonymous"></script> <script defer src="/assets/js/leaflet-setup.js?b6313931e203b924523e2d8b75fe8874" type="text/javascript"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js" integrity="sha256-ZgMyDAIYDYGxbcpJcfUnYwNevG/xi9OHKaR/8GK+jWc=" crossorigin="anonymous"></script> <script defer src="/assets/js/zoom.js?85ddb88934d28b74e78031fd54cf8308"></script> <script src="/assets/js/no_defer.js?2781658a0a2b13ed609542042a859126"></script> <script defer src="/assets/js/common.js?e0514a05c5c95ac1a93a8dfd5249b92e"></script> <script defer src="/assets/js/copy_code.js?c8a01c11a92744d44b093fc3bda915df" type="text/javascript"></script> <script defer src="/assets/js/jupyter_new_tab.js?d9f17b6adc2311cbabd747f4538bb15f"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script> <script src="/assets/js/mathjax-setup.js?a5bb4e6a542c546dd929b24b8b236dfd"></script> <script defer src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6" crossorigin="anonymous"></script> <script defer src="/assets/js/progress-bar.js?2f30e0e6801ea8f5036fa66e1ab0a71a" type="text/javascript"></script> <script src="/assets/js/tabs.min.js?b8748955e1076bbe0dabcf28f2549fdc"></script> <script src="/assets/js/vanilla-back-to-top.min.js?f40d453793ff4f64e238e420181a1d17"></script> <script>
     addBackToTop();
