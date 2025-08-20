@@ -21,16 +21,20 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
           npm init -y
           npm install googleapis
+
+      - name: Create Google service account file
+        run: |
+          echo "$GOOGLE_SA_JSON_BASE64" | base64 --decode > sa.json
 
       - name: Fetch sheet and write JSON
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           SHEET_RANGE: ${{ secrets.SHEET_RANGE }}
-          GOOGLE_SA_JSON_BASE64: ${{ secrets.GOOGLE_SA_JSON_BASE64 }}
+          GOOGLE_SA_JSON_PATH: sa.json
           OUTPUT_PATH: assets/json/table_data.json
         run: node _scripts/fetch_sheet_private.js
 
