@@ -40,6 +40,28 @@ console.log("Folder:", window.location.href.replace(window.location.pathname, ""
 <script>
 let map; // make map global so other functions can access it
 
+let tableData = [];
+
+fetch('../assets/json/table_data.json')
+  .then(res => res.json())
+  .then(json => {
+    tableData = json.slice(1).filter(row => row[0]); // skip empty dates
+    console.log("Table data loaded:", tableData);
+  })
+  .catch(err => console.error("Failed to load table_data.json:", err));
+
+const typeColors = {
+  "Hochtour": "purple",
+  "Hike": "green",
+  "Walk": "green",
+  "Run": "green",
+  "BackcountrySki": "blue",
+  "AlpineSki": "blue",
+  "Alpin Klettern": "red",
+  "Sport kletten": "red",
+  "Ride": "orange",
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   const mapDiv = document.getElementById('swiss-map');
   
@@ -90,9 +112,11 @@ function plotActivities(activities) {
 
         const latlngs = polyline.decode(activity.map.summary_polyline).map(([lat, lng]) => [lat, lng]);
 
+        const color = getActivityColor(activity);
+
         L.polyline(latlngs, {
-            color: 'blue',
-            weight: 3,
+            color: color,
+            weight: 5,
             opacity: 0.6
         }).addTo(map);
 
@@ -102,6 +126,31 @@ function plotActivities(activities) {
     if (allLatLngs.length > 0) {
         map.fitBounds(allLatLngs);
     }
+}
+
+function formatActivityDate(isoString) {
+  const d = new Date(isoString);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0'); // months are 0-indexed
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}/${mm}/${dd}`;
+}
+
+function getActivityColor(activity) {
+  if (!activity.start_date || !activity.name) return "blue";
+
+  const activityDate = formatActivityDate(activity.start_date);
+
+  const match = tableData.find(row =>
+    row[0] === activityDate// && row[1] === activity.name
+  );
+
+  if (match) {
+    const type = match[2]; // type of activity
+    return typeColors[type] || "blue";
+  }
+
+  return typeColors[activity.type] || "blue";
 }
 </script>
 
@@ -113,22 +162,70 @@ function plotActivities(activities) {
 
 {% tab log all %}
 test
-<table
-  data-click-to-select="true"
-  data-height="460"
-  data-pagination="true"
-  data-search="true"
-  data-toggle="table"
-  data-url="{{ '/assets/json/table_data.json' | relative_url }}">
+<table id="tourTable">
   <thead>
     <tr>
-      <th data-checkbox="true"></th>
-      <th data-field="id" data-halign="left" data-align="center" data-sortable="true">ID</th>
-      <th data-field="name" data-halign="center" data-align="right" data-sortable="true">Item Name</th>
-      <th data-field="price" data-halign="right" data-align="left" data-sortable="true">Item Price</th>
+      <th onclick="sortTable(0)">Date ⬍</th>
+      <th onclick="sortTable(1)">Tour ⬍</th>
+      <th onclick="sortTable(2)">Type ⬍</th>
+      <th onclick="sortTable(3)">Difficulty ⬍</th>
     </tr>
   </thead>
+  <tbody>
+    <!-- Rows will be inserted here by JavaScript -->
+  </tbody>
 </table>
+
+<script>
+// Fetch the JSON file
+fetch('../assets/json/table_data.json')
+  .then(response => response.json())
+  .then(data => {
+    const tbody = document.querySelector("#tourTable tbody");
+    
+    // Skip the header row
+    data.slice(1).forEach(row => {
+      if (!row[0]) return;  // ignore entries with no date
+
+      // First 3 columns
+      const tr = document.createElement("tr");
+      [0,1,2].forEach(i => {
+        const td = document.createElement("td");
+        td.textContent = row[i] || "";
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+
+      // 4th column: combine columns 6, 7, 8 (indices 5,6,7)
+      const tdGrades = document.createElement("td");
+      tdGrades.textContent = [row[4], row[5], row[6], row[7]].filter(Boolean).join(", ");
+      tr.appendChild(tdGrades);
+
+      tbody.appendChild(tr);
+    });
+
+    // Sorting function
+    window.sortTable = function(colIndex) {
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      const sorted = rows.sort((a,b) => {
+        const aText = a.cells[colIndex].textContent;
+        const bText = b.cells[colIndex].textContent;
+        return aText.localeCompare(bText, undefined, {numeric: true});
+      });
+      if (tbody.dataset.sortedCol == colIndex && tbody.dataset.sortDir == "asc") {
+        sorted.reverse();
+        tbody.dataset.sortDir = "desc";
+      } else {
+        tbody.dataset.sortDir = "asc";
+      }
+      tbody.dataset.sortedCol = colIndex;
+      tbody.innerHTML = "";
+      sorted.forEach(row => tbody.appendChild(row));
+    }
+  })
+  .catch(err => console.error("Failed to load JSON:", err));
+</script>
+
 
 {% endtab %}
 
