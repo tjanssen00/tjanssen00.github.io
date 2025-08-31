@@ -232,7 +232,7 @@ fetch('../assets/json/table_data.json')
 {% tab log hochtour %}
 
 ```javascript
-console.log("hello");
+console.log("hello ");
 ```
 
 {% endtab %}
