@@ -2,8 +2,8 @@ name: Update Website
 
 on:
   schedule:
-    - cron: "0 * * * *"   # runs every hour
-  workflow_dispatch:      # lets you run it manually
+    - cron: "0 * * * *"
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -13,26 +13,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download repo
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Install Python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Install requirements (if you have any)
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt || true
 
-      - name: Run your script
+      - name: Run Strava fetch
         run: |
           python strava_data_fetch/fetch_data.py
 
-      - name: Commit changes
+      - name: Build site (only if your project truly needs it)
+        run: npm run build || true
+
+      - name: Commit and push changes
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add .
-          git commit -m "Auto update" || echo "No changes"
+
+          git commit -m "chore: update Strava data" || echo "No changes"
+
           git push
