@@ -51,8 +51,13 @@ while True:
 import json
 
 # Save to file
+with open("activities.json", "w", encoding="utf-8") as f:
+    json.dump(all_activities, f, ensure_ascii=False, indent=2)
+    
 with open("_data//activities.json", "w", encoding="utf-8") as f:
     json.dump(all_activities, f, ensure_ascii=False, indent=2)
+
+
 
 print(len(all_activities))
 for count, activity in enumerate(all_activities):
