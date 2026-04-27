@@ -27,7 +27,7 @@ jobs:
 
       - name: Run your script
         run: |
-          python fetch_data.py
+          python strava_data_fetch/fetch_data.py
 
       - name: Commit changes
         run: |
