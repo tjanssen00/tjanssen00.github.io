@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Fetch activities and plot them
-  fetch('/activities.json')
+  fetch('_data/activities.json')
   .then(response => {
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
