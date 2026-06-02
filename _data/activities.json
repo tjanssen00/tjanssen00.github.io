@@ -5,7 +5,7 @@
       "id": 108055104,
       "resource_state": 1
     },
-    "name": "Morning Hike",
+    "name": "Paglia orba",
     "distance": 17553.7,
     "moving_time": 19451,
     "elapsed_time": 28047,
@@ -22,7 +22,7 @@
     "location_state": null,
     "location_country": null,
     "achievement_count": 0,
-    "kudos_count": 10,
+    "kudos_count": 11,
     "comment_count": 0,
     "athlete_count": 1,
     "photo_count": 0,
@@ -62,7 +62,7 @@
     "external_id": "garmin_ping_579251461279",
     "from_accepted_tag": false,
     "pr_count": 0,
-    "total_photo_count": 0,
+    "total_photo_count": 1,
     "has_kudoed": false
   },
   {
