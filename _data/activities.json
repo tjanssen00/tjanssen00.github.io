@@ -5,7 +5,7 @@
       "id": 108055104,
       "resource_state": 1
     },
-    "name": "Morning Hike",
+    "name": "Gross furkahorn ost",
     "distance": 8698.7,
     "moving_time": 9357,
     "elapsed_time": 30956,
@@ -22,7 +22,7 @@
     "location_state": null,
     "location_country": null,
     "achievement_count": 0,
-    "kudos_count": 0,
+    "kudos_count": 3,
     "comment_count": 0,
     "athlete_count": 1,
     "photo_count": 0,
@@ -34,8 +34,8 @@
     "trainer": false,
     "commute": false,
     "manual": false,
-    "private": true,
-    "visibility": "only_me",
+    "private": false,
+    "visibility": "everyone",
     "flagged": false,
     "gear_id": null,
     "start_latlng": [
@@ -62,7 +62,7 @@
     "external_id": "garmin_ping_587457075416",
     "from_accepted_tag": false,
     "pr_count": 0,
-    "total_photo_count": 0,
+    "total_photo_count": 3,
     "has_kudoed": false
   },
   {
