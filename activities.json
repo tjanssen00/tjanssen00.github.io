@@ -6,7 +6,7 @@
       "id_str": "108055104",
       "resource_state": 1
     },
-    "name": "Morning Hike",
+    "name": "Piz Nair",
     "distance": 22515.9,
     "moving_time": 16292,
     "elapsed_time": 29915,
@@ -23,8 +23,8 @@
     "location_city": null,
     "location_state": null,
     "location_country": null,
-    "achievement_count": 0,
-    "kudos_count": 0,
+    "achievement_count": 2,
+    "kudos_count": 8,
     "comment_count": 0,
     "athlete_count": 1,
     "photo_count": 0,
@@ -36,8 +36,8 @@
     "trainer": false,
     "commute": false,
     "manual": false,
-    "private": true,
-    "visibility": "only_me",
+    "private": false,
+    "visibility": "everyone",
     "flagged": false,
     "gear_id": null,
     "start_latlng": [
@@ -64,7 +64,7 @@
     "external_id": "garmin_ping_590555729080",
     "from_accepted_tag": false,
     "pr_count": 0,
-    "total_photo_count": 0,
+    "total_photo_count": 10,
     "has_kudoed": false
   },
   {
