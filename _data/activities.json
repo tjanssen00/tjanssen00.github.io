@@ -6,7 +6,7 @@
       "id_str": "108055104",
       "resource_state": 1
     },
-    "name": "Middaghike",
+    "name": "Stoosssattel",
     "distance": 10242.7,
     "moving_time": 10793,
     "elapsed_time": 16603,
@@ -25,7 +25,7 @@
     "location_state": null,
     "location_country": null,
     "achievement_count": 0,
-    "kudos_count": 0,
+    "kudos_count": 3,
     "comment_count": 0,
     "athlete_count": 1,
     "photo_count": 0,
@@ -37,8 +37,8 @@
     "trainer": false,
     "commute": false,
     "manual": false,
-    "private": true,
-    "visibility": "only_me",
+    "private": false,
+    "visibility": "everyone",
     "flagged": false,
     "gear_id": null,
     "start_latlng": [
@@ -65,7 +65,7 @@
     "external_id": "garmin_ping_657884881134",
     "from_accepted_tag": false,
     "pr_count": 0,
-    "total_photo_count": 0,
+    "total_photo_count": 4,
     "has_kudoed": false,
     "suffer_score": 33.0
   },
